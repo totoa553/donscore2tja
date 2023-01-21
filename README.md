@@ -7,6 +7,7 @@
 ## Demo
 
 https://donscore2tja.vercel.app/
+![donscore2tja vercel app_ (1)](https://user-images.githubusercontent.com/77469536/213867687-45a6898c-caf6-44a1-81ce-147763f17a33.png)
 
 
 ## License
