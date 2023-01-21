@@ -13,3 +13,6 @@ https://donscore2tja.vercel.app/
 
 [gpl-3.0](https://choosealicense.com/licenses/gpl-3.0/)
 
+## Thanks
+
+https://github.com/hughsk/png-chunks-extract
