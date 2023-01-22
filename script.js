@@ -4,7 +4,6 @@ async function load(link) {
 	var buffer = new Uint8Array(await image.arrayBuffer());
 	var data = extractChunks(buffer);
 	var string = new TextDecoder('utf-16').decode(data.filter(a=>a.name=="dsCr")[0].data).trim()
-	console.log(string)
 
 	FinalData= parseDonscore(string)
 	
@@ -39,6 +38,13 @@ function gcd(a) {
     return ans 
 }
 
+function xnumx(a){
+	i=a
+	while(Number.isInteger(a)==false){
+		a=a+i
+	}
+	return a
+}
 
 function BranchObj(chart, startBar, endBar, barinfo) {
 	this.chart = chart;
@@ -271,7 +277,6 @@ function parseDonscore(ds) {
 		TJA.push(`#BRANCHEND:${bar}`)
 	}
 	TJA = TJA.filter(a => !a.includes("BRANCH"))
-	console.log(branchArr)
 	var metaline = [];
 	var re;
 	var tempArr4;
@@ -310,7 +315,6 @@ function parseDonscore(ds) {
 		}
 		if (isbranched2 == false) {
 			if (TJA.filter(a => a.split(":")[1].trim().split(",")[0].trim() == i.toString()).length != 0) {
-				console.log(chartline,tempArr3)
 				chartline.push(parseLine(TJA.filter(a => a.split(":")[1].trim().split(",")[0].trim() == i.toString()), tempArr3[i], barinfo[i]))
 				chartline = chartline.flat()
 			} else {
@@ -553,18 +557,18 @@ function parseDonscore(ds) {
 		}
 	}
 	chartline.push("#END")
-	console.log(`${metaline.join("\n")}\n\n${chartline.flat().join("\n")}`)
 	return `${metaline.join("\n")}\n\n${chartline.flat().join("\n")}`
 }
 
 /**
  * arr1 TJA.filter(a=>a.split(":")[1].trim().split(",")[0].trim()==i.toString())
- * 
+ * barin meter, measure, beatchar
  */
 function parseLine(arr1, line, barin) {
 	tempArr6 = []
 	tempArr4 = []
 	returnarr = []
+	lcmv=1;
 	arr1.forEach((item) => {
 		if (item.startsWith("#SCROLL") || item.startsWith("#BPMCHANGE") || item.startsWith("#GOGOSTART") || item.startsWith("#GOGOEND")) {
 			if (item.split(":")[1].trim().split(",")[1] != "undefined" && item.split(":")[1].trim().split(",")[2] != "undefined") {
@@ -585,16 +589,24 @@ function parseLine(arr1, line, barin) {
 			returnarr.push(line + ",")
 		}
 	}
-	console.log(tempArr4,tempArr6,line,barin,parseInt(parseInt(barin[1])*lcm([4*lcm(tempArr4.map(a=>a[1])),parseInt(barin[0])])/parseInt(barin[0])))
 	if (tempArr4.length != 0) {
 		tempNum1 = 0
 		tempArr4 = tempArr4.sort((a, b) => (parseInt(a[2]) / parseInt(a[1])) - (parseInt(b[2]) / parseInt(b[1])))
+			//if(a.length)
 		//7*lcm([8,16])/16
+		//
+		lcmv=lcm(tempArr4.map(a=>a[1]))
+		console.log(line)
+		if(4*lcm(tempArr4.map(a=>a[1]))/parseInt(barin[0])>1){
+			var temp1=[]
+			line.split("").forEach((item)=>{
+				temp1.push(item+"0".repeat(lcm(tempArr4.map(a=>a[1]))-1))
+			})
+			line=temp1.join("")
+		}
 		//parseInt(parseInt(barin[1])*lcm([4*lcm(tempArr4.map(a=>a[1])),parseInt(barin[0])])/parseInt(barin[0])
 		re = new RegExp(`.{${lcm([4*lcm(tempArr4.map(a=>a[1])),parseInt(barin[0])])/parseInt(barin[0])}}`, "g")
-		lcm_val = lcm(tempArr4.map(a => a[1]));
 		tempArr5 = line.match(re)
-		console.log(tempArr5)
 		bB = 0
 		arr = []
 		c = 0
@@ -616,13 +628,35 @@ function parseLine(arr1, line, barin) {
 		}
 		tempArr4 = arr;
 		tempArr4.forEach((arr, index) => {
-			returnarr.push(tempArr5.slice(tempNum1, (lcm_val / parseInt(arr[0][1]) * parseInt(arr[0][2]))).join(""))
+			//if(tempArr5.join("").length)
+			console.log(barin)
+			console.log(arr[0])
+			if(4*lcmv/parseInt(barin[0])>1){
+				//一拍子をget 4の6等分の場合
+				//#MEASURE 5/16のときは
+				//4*6=24
+				//3*8=24?
+				//24部は
+				//30で16分の5なら16分の1は、30/5=>6
+				//16分の1を3とすると4分の1は、48
+				//6分の1は8になる
+				//3*5=15,15/8
+				//30/6=5,
+				//90/5*16/2/4
+				//line.length/barin[1]*barin[0]/parseInt(arr[0][1])/4*parseInt(arr[0][2])
+				console.log(barin,arr,lcmv,tempArr5)
+				console.log(tempArr5.slice(tempNum1, (line.length/barin[1]*barin[0]/parseInt(arr[0][1])/4)*parseInt(arr[0][2])/tempArr5[0].length).join(""))
+				returnarr.push(tempArr5.slice(tempNum1, tempNum1=(line.length/barin[1]*barin[0]/parseInt(arr[0][1])/4)*parseInt(arr[0][2])/tempArr5[0].length).join(""))
+				console.log((line.length/barin[1]*barin[0]/parseInt(arr[0][1])/4)*parseInt(arr[0][2])/tempArr5[0].length,tempArr5.length)
+			}else{
+				returnarr.push(tempArr5.slice(tempNum1, tempNum1=(line.length/barin[1]*barin[0]/parseInt(arr[0][1])/4)*parseInt(arr[0][2])/tempArr5[0].length).join(""))
+				console.log(parseInt(arr[0][2])*(lcmv/parseInt(arr[0][1]))*barin[0]/(4*parseInt(arr[0][1])))
+			}
 			arr.forEach((line) => {
 				returnarr.push(line[0])
-				tempNum1 = lcm_val / parseInt(arr[0][1]) * parseInt(arr[0][2])
 			})
 			if (tempArr4.length == index + 1) {
-				returnarr.push(tempArr5.slice(lcm_val / parseInt(arr[0][1]) * parseInt(arr[0][2]), tempArr5.length).join("") + ",")
+				returnarr.push(tempArr5.slice(tempNum1, tempArr5.length).join("") + ",")
 			}
 		})
 	}
@@ -638,9 +672,8 @@ document.querySelector("#dropzone-file").addEventListener("change",function(e){
 		document.querySelector("#dropzone").classList.add("hidden")
 		document.querySelector("#imagezone").classList.remove("hidden")
 		image.src = reader.result;
-		console.log(load((image.src)))
+		load((image.src))
 		setTimeout(() => {
-			console.log(FinalData)
 			document.querySelector("textarea").textContent=FinalData
 		}, 100);
 	}, false);
@@ -682,7 +715,6 @@ document.querySelector("#dropzone").addEventListener('dragleave', function(e) {
 document.querySelector("#dropzone").addEventListener('drop', function(e) {
 	e.stopPropagation();
 	e.preventDefault();
-	console.log("aaaaaa")
 	var files = e.dataTransfer.files;
 	this.style.background = '#f3f4f6';
 	if (files.length > 1) return alert('アップロードできるファイルは1つだけです。');
@@ -693,9 +725,8 @@ document.querySelector("#dropzone").addEventListener('drop', function(e) {
 		document.querySelector("#dropzone").classList.add("hidden")
 		document.querySelector("#imagezone").classList.remove("hidden")
 		image.src = reader.result;
-		console.log(load((image.src)))
+		load((image.src))
 		setTimeout(() => {
-			console.log(FinalData)
 			document.querySelector("textarea").textContent=FinalData
 		}, 100);
 	}, false);
