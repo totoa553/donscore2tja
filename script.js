@@ -3,7 +3,7 @@ async function load(link) {
 	var image = await fetch(link);
 	var buffer = new Uint8Array(await image.arrayBuffer());
 	var data = extractChunks(buffer);
-	var string = new TextDecoder('utf-16').decode(data[1].data).trim()
+	var string = new TextDecoder('utf-16').decode(data.filter(a=>a.name=="dsCr")[0].data).trim()
 	console.log(string)
 
 	FinalData= parseDonscore(string)
@@ -29,6 +29,16 @@ function lcm(a) {
 	}
 	return ans
 }
+
+function gcd(a) {
+    var f = (a, b) => b ? f(b, a % b) : a
+    var ans = a[0]
+    for (var i = 1; i < a.length; i++) {
+        ans = f(ans, a[i]); 
+    }
+    return ans 
+}
+
 
 function BranchObj(chart, startBar, endBar, barinfo) {
 	this.chart = chart;
@@ -300,6 +310,7 @@ function parseDonscore(ds) {
 		}
 		if (isbranched2 == false) {
 			if (TJA.filter(a => a.split(":")[1].trim().split(",")[0].trim() == i.toString()).length != 0) {
+				console.log(chartline,tempArr3)
 				chartline.push(parseLine(TJA.filter(a => a.split(":")[1].trim().split(",")[0].trim() == i.toString()), tempArr3[i], barinfo[i]))
 				chartline = chartline.flat()
 			} else {
@@ -574,12 +585,16 @@ function parseLine(arr1, line, barin) {
 			returnarr.push(line + ",")
 		}
 	}
+	console.log(tempArr4,tempArr6,line,barin,parseInt(parseInt(barin[1])*lcm([4*lcm(tempArr4.map(a=>a[1])),parseInt(barin[0])])/parseInt(barin[0])))
 	if (tempArr4.length != 0) {
 		tempNum1 = 0
 		tempArr4 = tempArr4.sort((a, b) => (parseInt(a[2]) / parseInt(a[1])) - (parseInt(b[2]) / parseInt(b[1])))
-		re = new RegExp(`.{${parseInt(barin[2])/lcm(tempArr4.map(a=>a[1]))}}`, "g")
+		//7*lcm([8,16])/16
+		//parseInt(parseInt(barin[1])*lcm([4*lcm(tempArr4.map(a=>a[1])),parseInt(barin[0])])/parseInt(barin[0])
+		re = new RegExp(`.{${lcm([4*lcm(tempArr4.map(a=>a[1])),parseInt(barin[0])])/parseInt(barin[0])}}`, "g")
 		lcm_val = lcm(tempArr4.map(a => a[1]));
 		tempArr5 = line.match(re)
+		console.log(tempArr5)
 		bB = 0
 		arr = []
 		c = 0
