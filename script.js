@@ -3,14 +3,15 @@ async function load(link) {
 	var image = await fetch(link);
 	var buffer = new Uint8Array(await image.arrayBuffer());
 	var data = extractChunks(buffer);
+	if(!(data.filter(a=>a.name=="dsCr")[0])){
+		alert("情報が読み取れませんでした")
+		location.reload()
+	}
 	var string = new TextDecoder('utf-16').decode(data.filter(a=>a.name=="dsCr")[0].data).trim()
 
 	FinalData= parseDonscore(string)
 	
-	if(FinalData.includes("TITLE")==false){
-		alert("情報が読み取れませんでした")
-		location.reload()
-	}
+
 }
 
 /***
