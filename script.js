@@ -55,6 +55,7 @@ function BranchObj(chart, startBar, endBar, barinfo) {
 }
 
 function parseDonscore(ds) {
+	console.log(ds)
 	var bar = 0;
 	var Meta1 = [];
 	var Meta2 = [];
@@ -175,8 +176,8 @@ function parseDonscore(ds) {
 					flag = 0
 					titem = ""
 					if (item.includes("k") || item.includes("p") || item.includes("b") || item.includes("d") || item.includes("@")) {
-						balloon.push(item.match(/(\d+)/g).flatMap(a => parseInt(a)))
-						balloon = balloon.flat()
+						// balloon.push(item.match(/(\d+)/g).flatMap(a => parseInt(a)))
+						// balloon = balloon.flat()
 					}
 					item.split("").forEach((char) => {
 						if (char == 3) {
@@ -225,8 +226,9 @@ function parseDonscore(ds) {
 
 				} else {
 					if (item.includes("k") || item.includes("p") || item.includes("b") || item.includes("d") || item.includes("@")) {
-						balloon.push(item.match(/(\d+)/g).flatMap(a => parseInt(a)))
-						balloon = balloon.flat()
+						console.log(item)
+						// balloon.push(item.match(/(\d+)/g).flatMap(a => parseInt(a)))
+						// balloon = balloon.flat()
 					}
 					item = (item.replaceAll("\t", " ".repeat(tab)) + "0".repeat(beatchar * measure)).slice(0, beatchar * measure).split("");
 					tempArr2 = []
@@ -277,6 +279,7 @@ function parseDonscore(ds) {
 		branchArr[branchArr.length - 1].endBar = bar;
 		TJA.push(`#BRANCHEND:${bar}`)
 	}
+	balloon=strings.filter(vd=>!vd.startsWith("#")&&!vd.startsWith(";")&&!vd=="").join("").replace(/\r?\ n/g,"").match(/(?<=@|k|d|p|b)\d+(?==)/g)
 	TJA = TJA.filter(a => !a.includes("BRANCH"))
 	var metaline = [];
 	var re;
